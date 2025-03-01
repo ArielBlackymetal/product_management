@@ -40,4 +40,35 @@ class ProductApiTest extends TestCase
             ])
             ->assertJsonCount(10, 'data');
     }
+
+    public function testItCanShowAProduct()
+    {
+        $product = Product::factory()->create();
+
+        $response = $this->getJson('/api/products/' . $product->id);
+
+        $response->assertStatus(Response::HTTP_OK)
+            ->assertJsonStructure([
+                'data' => [
+                    'id',
+                    'type',
+                    'attributes' => [
+                        'name',
+                        'price',
+                        'description',
+                        'category_id',
+                        'image',
+                    ],
+                    'links'
+                ]
+            ])
+            ->assertJson([
+                'data' => [
+                    'id' => $product->id,
+                    'attributes' => [
+                        'name' => $product->name
+                    ]
+                ]
+            ]);
+    }
 }
