@@ -47,6 +47,13 @@ DB_USERNAME=root
 DB_PASSWORD=
 ```
 
+- Add database for Testing
+
+```bash
+
+DB_DATABASE_TEST=test
+```
+
 - Save `.env` file
 - From cli at project root execute composer
 
@@ -67,4 +74,11 @@ php artisan key:generate
 ```bash
 
 php artisan migrate
+```
+
+- Execute seeder
+
+```bash
+
+php artisan db:seed
 ```
