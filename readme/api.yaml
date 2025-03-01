@@ -1,0 +1,208 @@
+openapi: 3.0.0
+info:
+  title: Products API
+  description: API for managing products
+  version: 1.0.0
+servers:
+  - url: https://localhost:3000/v1
+    description: Production server
+paths:
+  /products:
+    get:
+      summary: Retrieve a list of products
+      operationId: getProducts
+      tags:
+        - Products
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+          description: Page number for pagination
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 10
+          description: Number of items per page
+      responses:
+        '200':
+          description: A paginated list of products
+          content:
+            application/vnd.api+json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ProductData'
+                  meta:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                        description: Total number of products
+                        example: 1
+                      page:
+                        type: integer
+                        description: Current page number
+                        example: 1
+                      per_page:
+                        type: integer
+                        description: Number of products per page
+                        example: 10
+                  links:
+                    type: object
+                    properties:
+                      self:
+                        type: string
+                        format: uri
+                        example: http://localhost:3000/v1/products
+                      first:
+                        type: string
+                        format: uri
+                        example: http://localhost:3000/v1/products?page=1
+                      last:
+                        type: string
+                        format: uri
+                        example: http://localhost:3000/v1/products?page=1
+                      prev:
+                        type: string
+                        format: uri
+                        nullable: true
+                        example: http://localhost:3000/v1/products?page=1
+                      next:
+                        type: string
+                        format: uri
+                        nullable: true
+                        example: http://localhost:3000/v1/products?page=2
+    post:
+      summary: Create a new product
+      operationId: createProduct
+      tags:
+        - Products
+      requestBody:
+        required: true
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/ProductRequest'
+      responses:
+        '201':
+          description: Product created successfully
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/ProductResponse'
+  /products/{id}:
+    get:
+      summary: Retrieve a single product
+      operationId: getProduct
+      tags:
+        - Products
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Product details
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/ProductResponse'
+    put:
+      summary: Update an existing product
+      operationId: updateProduct
+      tags:
+        - Products
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/ProductRequest'
+      responses:
+        '200':
+          description: Product updated successfully
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/ProductResponse'
+    delete:
+      summary: Delete a product
+      operationId: deleteProduct
+      tags:
+        - Products
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Product deleted successfully
+components:
+  schemas:
+    ProductResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ProductData'
+    ProductRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        image:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+          format: float
+        category_id:
+          type: string
+    ProductData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Product id
+          example: 1
+        type:
+          type: string
+          example: product
+        attributes:
+          type: object
+          properties:
+            name:
+              type: string
+              example: "Televisor Full HD"
+            image:
+              type: string
+              example: "http://url.to/image.jpg"
+            description:
+              type: string
+              example: "El televisor con la mejor calidad Full HD"
+            price:
+              type: number
+              format: float
+              example: 1_234_000.00
+            category_id:
+              type: string
+              example: 1
