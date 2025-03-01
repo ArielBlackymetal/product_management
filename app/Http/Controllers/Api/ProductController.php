@@ -2,18 +2,30 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Http\Controllers\Controller;
+use App\Http\Resources\ProductCollection;
+use App\Interfaces\ProductRepositoryInterface;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
     /**
+     * @param protected App\Interfaces\ProductRepositoryInterface
+     */
+    public function __construct(
+        protected ProductRepositoryInterface $productRepo
+    ) {
+    }
+
+    /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $filters = $request->all();
+        $products = $this->productRepo->get($filters);
+        return new ProductCollection($products);
     }
 
     /**

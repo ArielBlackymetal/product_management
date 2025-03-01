@@ -29,7 +29,7 @@ class ProductApiTest extends TestCase
                             'name',
                             'price',
                             'description',
-                            'category',
+                            'category_id',
                             'image',
                         ],
                         'links'
