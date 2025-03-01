@@ -76,9 +76,32 @@ php artisan key:generate
 php artisan migrate
 ```
 
+for testing
+
+```bash
+php artisan migrate --database=test
+
+```
+
 - Execute seeder
 
 ```bash
 
 php artisan db:seed
 ```
+
+for testing
+
+```bash
+
+php artisan db:seed --database=test
+```
+
+- Create storage link to see uploaded images
+
+```bash
+
+php artisan storage:link
+```
+
+- Execute seeder for

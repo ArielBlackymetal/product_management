@@ -3,19 +3,24 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\Product;
-use App\Http\Resources\ProductResource;
+use App\Services\ImageService;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ProductResource;
 use App\Http\Resources\ProductCollection;
+use App\Http\Requests\StoreProductRequest;
 use App\Interfaces\ProductRepositoryInterface;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class ProductController extends Controller
 {
     /**
      * @param protected App\Interfaces\ProductRepositoryInterface
+     * @param protected App\Services\ImageService
      */
     public function __construct(
-        protected ProductRepositoryInterface $productRepo
+        protected ProductRepositoryInterface $productRepo,
+        protected ImageService $imageService
     ) {
     }
 
@@ -32,9 +37,20 @@ class ProductController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreProductRequest $request)
     {
-        //
+        $data = $request->validated();
+        if ($request->hasFile('image')) {
+            $data['image'] = $this->imageService->uploadImage($request->file('image'));
+        } else {
+            // Get image from external service
+            $data['image'] = $this->imageService->getPlaceholderImage($data['name']);
+        }
+        $product = $this->productRepo->store($data);
+        return (new ProductResource($product))
+            ->response()
+            ->setStatusCode(Response::HTTP_CREATED)
+            ->header('Location', route('products.show', $product->id));
     }
 
     /**

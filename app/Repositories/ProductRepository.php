@@ -2,11 +2,12 @@
 
 namespace App\Repositories;
 
-use App\Interfaces\ProductRepositoryInterface;
 use App\Models\Product;
+use App\Interfaces\ProductStoreInterface;
+use App\Interfaces\ProductRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
-class ProductRepository implements ProductRepositoryInterface
+class ProductRepository implements ProductRepositoryInterface, ProductStoreInterface
 {
     /**
      * {@inheritdoc}
@@ -24,5 +25,13 @@ class ProductRepository implements ProductRepositoryInterface
             $query = $query->where('products.category_id', $filters['category_id']);
         }
         return $query->paginate($size);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function store(array $data): Product
+    {
+        return Product::create($data);
     }
 }

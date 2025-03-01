@@ -2,11 +2,13 @@
 
 namespace Tests\Feature;
 
-use App\Models\Product;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Http\Response;
 use Tests\TestCase;
+use App\Models\Product;
+use Illuminate\Http\Response;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class ProductApiTest extends TestCase
 {
@@ -70,5 +72,51 @@ class ProductApiTest extends TestCase
                     ]
                 ]
             ]);
+    }
+
+    public function testItCanCreateAProduct()
+    {
+        Storage::fake('products');
+
+        $data = [
+            'name' => $this->faker->word,
+            'price' => $this->faker->randomFloat(2, 10, 1000),
+            'description' => $this->faker->paragraph,
+            'image' => UploadedFile::fake()->image('avatar.jpg'),
+            'category_id' => '1'
+        ];
+
+        $response = $this->postJson('/api/products', $data);
+
+        $response->assertStatus(Response::HTTP_CREATED)
+            ->assertJsonStructure([
+                'data' => [
+                    'id',
+                    'type',
+                    'attributes' => [
+                        'name',
+                        'price',
+                        'description',
+                        'category_id',
+                        'image',
+                    ],
+                    'links'
+                ]
+            ]);
+
+        $this->assertDatabaseHas('products', [
+            'name' => $data['name'],
+            'price' => $data['price'],
+            'description' => $data['description'],
+            'category_id' => $data['category_id']
+        ]);
+    }
+
+    public function testItValidatesRequiredFieldsWhenCreatingAProduct()
+    {
+        $response = $this->postJson('/api/products', []);
+
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
+            ->assertJsonValidationErrors(['name', 'price', 'description', 'category_id']);
     }
 }
