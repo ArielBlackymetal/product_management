@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\ProductResource;
 use App\Http\Resources\ProductCollection;
 use App\Http\Requests\StoreProductRequest;
+use App\Http\Requests\UpdateProductRequest;
 use App\Interfaces\ProductRepositoryInterface;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -64,9 +65,18 @@ class ProductController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Product $product)
+    public function update(UpdateProductRequest $request, Product $product)
     {
-        //
+        $data = $request->validated();
+
+        // Handle the image if a new one is provided
+        if ($request->hasFile('image')) {
+            $data['image'] = $this->imageService->uploadImage($request->file('image'));
+        }
+
+        $product = $this->productRepo->update($product, $data);
+
+        return new ProductResource($product);
     }
 
     /**

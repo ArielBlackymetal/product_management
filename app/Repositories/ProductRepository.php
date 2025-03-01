@@ -4,10 +4,11 @@ namespace App\Repositories;
 
 use App\Models\Product;
 use App\Interfaces\ProductStoreInterface;
+use App\Interfaces\ProductUpdateInterface;
 use App\Interfaces\ProductRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
-class ProductRepository implements ProductRepositoryInterface, ProductStoreInterface
+class ProductRepository implements ProductRepositoryInterface, ProductStoreInterface, ProductUpdateInterface
 {
     /**
      * {@inheritdoc}
@@ -33,5 +34,14 @@ class ProductRepository implements ProductRepositoryInterface, ProductStoreInter
     public function store(array $data): Product
     {
         return Product::create($data);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function update(Product $product, array $data): Product
+    {
+        $product->update($data);
+        return $product;
     }
 }

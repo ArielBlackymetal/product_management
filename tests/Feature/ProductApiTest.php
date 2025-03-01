@@ -119,4 +119,32 @@ class ProductApiTest extends TestCase
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
             ->assertJsonValidationErrors(['name', 'price', 'description', 'category_id']);
     }
+
+    public function testItCanUpdateAProduct()
+    {
+        $product = Product::factory()->create();
+
+        $data = [
+            'name' => 'Producto actualizado',
+            'price' => 150.00,
+        ];
+
+        $response = $this->patchJson('/api/products/' . $product->id, $data);
+
+        $response->assertStatus(Response::HTTP_OK)
+            ->assertJson([
+                'data' => [
+                    'attributes' => [
+                        'name' => 'Producto actualizado',
+                        'price' => 150.00,
+                    ]
+                ]
+            ]);
+
+        $this->assertDatabaseHas('products', [
+            'id' => $product->id,
+            'name' => 'Producto actualizado',
+            'price' => 150.00,
+        ]);
+    }
 }
