@@ -4,7 +4,7 @@ info:
   description: API for managing products
   version: 1.0.0
 servers:
-  - url: https://localhost:3000/v1
+  - url: https://localhost:8000/
     description: Production server
 paths:
   /products:
@@ -62,25 +62,25 @@ paths:
                       self:
                         type: string
                         format: uri
-                        example: http://localhost:3000/v1/products
+                        example: http://localhost:8000/products
                       first:
                         type: string
                         format: uri
-                        example: http://localhost:3000/v1/products?page=1
+                        example: http://localhost:8000/products?page=1
                       last:
                         type: string
                         format: uri
-                        example: http://localhost:3000/v1/products?page=1
+                        example: http://localhost:8000/products?page=1
                       prev:
                         type: string
                         format: uri
                         nullable: true
-                        example: http://localhost:3000/v1/products?page=1
+                        example: http://localhost:8000/products?page=1
                       next:
                         type: string
                         format: uri
                         nullable: true
-                        example: http://localhost:3000/v1/products?page=2
+                        example: http://localhost:8000/products?page=2
     post:
       summary: Create a new product
       operationId: createProduct
