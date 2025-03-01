@@ -14,7 +14,7 @@ Users `users`
 Categories `categories`
 `id`, `name`, `created_at`, `updated_at`
 
-![ERM Image](readme/api.yaml "Entity-Relationship Model Image!")
+![ERM Image](readme/MER.png "Entity-Relationship Model Image!")
 
 ## API Definition
 
