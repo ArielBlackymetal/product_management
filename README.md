@@ -22,3 +22,48 @@ Categories `categories`
 ensuring consistency and eliminating the need for custom formatting.
 - Endpoints [Documentation](readme/api.yaml) for products
 
+## Install project
+
+### Backend
+
+- Create database, from your MySQL IDE or console execute this SQL
+
+```sql
+
+CREATE DATABASE `product_management`;
+```
+
+- Create file `.env` from `.env.example`
+- Open `.env` file and update database info using yours
+
+```bash
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=product_management
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+- Save `.env` file
+- From cli at project root execute composer
+
+```bash
+
+composer install
+```
+
+- Now create the `APP_KEY`
+
+```bash
+
+php artisan key:generate
+```
+
+- Execute migrations
+
+```bash
+
+php artisan migrate
+```
