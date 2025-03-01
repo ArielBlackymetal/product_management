@@ -34,7 +34,8 @@ CREATE DATABASE `product_management`;
 ```
 
 - Create file `.env` from `.env.example`
-- Open `.env` file and update database info using yours
+- Open `.env` file and update database info using yours.
+Don't forget to change `DB_CONNECTION` to `mysql`
 
 ```bash
 
