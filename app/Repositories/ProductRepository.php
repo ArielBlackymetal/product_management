@@ -5,10 +5,15 @@ namespace App\Repositories;
 use App\Models\Product;
 use App\Interfaces\ProductStoreInterface;
 use App\Interfaces\ProductUpdateInterface;
+use App\Interfaces\ProductDeleteInterface;
 use App\Interfaces\ProductRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
-class ProductRepository implements ProductRepositoryInterface, ProductStoreInterface, ProductUpdateInterface
+class ProductRepository implements
+    ProductRepositoryInterface,
+    ProductStoreInterface,
+    ProductUpdateInterface,
+    ProductDeleteInterface
 {
     /**
      * {@inheritdoc}
@@ -43,5 +48,13 @@ class ProductRepository implements ProductRepositoryInterface, ProductStoreInter
     {
         $product->update($data);
         return $product;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function delete(Product $product): void
+    {
+        $product->delete();
     }
 }

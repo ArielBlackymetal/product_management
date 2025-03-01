@@ -147,4 +147,14 @@ class ProductApiTest extends TestCase
             'price' => 150.00,
         ]);
     }
+
+    public function testItCanDeleteAProduct()
+    {
+        $product = Product::factory()->create();
+
+        $response = $this->deleteJson('/api/products/' . $product->id);
+
+        $response->assertStatus(Response::HTTP_NO_CONTENT);
+        $this->assertDatabaseMissing('products', ['id' => $product->id]);
+    }
 }
