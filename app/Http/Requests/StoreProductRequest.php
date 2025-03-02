@@ -30,7 +30,7 @@ class StoreProductRequest extends FormRequest
             'price.numeric' => 'El precio debe ser un valor numérico.',
             'description.required' => 'La descripción es obligatoria.',
             'category_id.required' => 'La categoría es obligatoria.',
-            'image.image' => 'El archivo debe ser una imagen.',
+            'image.image' => 'El archivo debe ser una imagen o el tamaño no superar 2MB.',
         ];
     }
 }
