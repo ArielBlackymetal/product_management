@@ -32,6 +32,12 @@ ensuring consistency and eliminating the need for custom formatting.
 
 CREATE DATABASE `product_management`;
 ```
+Create database for testing
+
+```sql
+
+CREATE DATABASE `test`;
+```
 
 - Create file `.env` from `.env.example`
 - Open `.env` file and update database info using yours.
@@ -103,6 +109,24 @@ php artisan db:seed --database=test
 
 php artisan storage:link
 ```
+
+- Then, start the backend server with:
+
+```bash
+
+php artisan serve
+```
+By default, this will run on port `8000` if thar port is already in use, you can specify a differente one with:
+
+```bash
+
+php artisan serve --port=8080
+```
+
+### Frontend
+
+Follow the instructions on the GitHub repository [product_management_frontend](https://github.com/ArielBlackymetal/product_management_frontend).
+
 ### SQL optimization
 
 The following indexes have been created:
@@ -157,3 +181,33 @@ ORDER BY `total_revenue` DESC
 ```
 
 - Finally, caching the queries can further improve performance.
+
+### Best practices
+
+- Followed the PSR-12 coding standard for clean and structured code.
+- Created interfaces to implement repositories. While not strictly necessary for this project, this follows the Interface Segregation Principle.
+- Implemented repositories to decouple the data access logic, making them easily interchangeable.
+- Applied the Dependency Inversion Principle to improve code maintainability and flexibility.
+
+### Test coverage
+
+![Coverage Image](readme/AssesmentCoverage.png "Assesment Coverage Image!")
+
+Running tests
+
+```bash
+
+php artisan test
+```
+or
+
+```bash
+
+php artisan test --coverage
+```
+or
+```bash
+
+./vendor/bin/phpunit --coverage-html coverage
+```
+Open `index.html` on coverage directory to see the coverage report.

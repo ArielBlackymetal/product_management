@@ -4,7 +4,7 @@ info:
   description: API for managing products
   version: 1.0.0
 servers:
-  - url: http://localhost:8000/
+  - url: http://localhost:8000/api/
     description: Production server
 paths:
   /products:
@@ -156,6 +156,24 @@ paths:
       responses:
         '204':
           description: Product deleted successfully
+  /orders/stats:
+    get:
+      summary: Retrieve a list of product statistics, including products with more than 50 orders, total orders, average price, and total revenue.
+      operationId: getOrdersStats
+      tags:
+        - Stats
+      responses:
+        '200':
+          description: A paginated list of products
+          content:
+            application/vnd.api+json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/StatsData'
 components:
   schemas:
     ProductResponse:
@@ -206,3 +224,28 @@ components:
             category_id:
               type: string
               example: 1
+    StatsData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Product id
+          example: 1
+        type:
+          type: string
+          example: stat
+        attributes:
+          type: object
+          properties:
+            name:
+              type: string
+              example: "Producto 1"
+            total_orders:
+              type: number
+              example: 82
+            average_price:
+              type: string
+              example: "19192.14"
+            total_revenue:
+              type: string
+              example: "8386965.18"
