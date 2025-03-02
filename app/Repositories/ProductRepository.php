@@ -27,8 +27,13 @@ class ProductRepository implements
         if (isset($filters['name'])) {
             $query = $query->where('products.name', 'like', sprintf('%%%s%%', $filters['name']));
         }
-        if (isset($filters['price'], $filters['price']['min'], $filters['price']['max'])) {
-            $query = $query->whereBetween('products.price', [$filters['price']['min'], $filters['price']['max']]);
+        if (isset($filters['price'])) {
+            if (isset($filters['price']['min'])) {
+                $query = $query->where('products.price', '>=', $filters['price']['min']);
+            }
+            if (isset($filters['price']['max'])) {
+                $query = $query->where('products.price', '<=', $filters['price']['max']);
+            }
         }
         if (isset($filters['category_id'])) {
             $query = $query->where('products.category_id', $filters['category_id']);
