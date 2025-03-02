@@ -9,6 +9,8 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Exception;
+
 
 class ProductApiTest extends TestCase
 {
@@ -41,6 +43,40 @@ class ProductApiTest extends TestCase
                 'links'
             ])
             ->assertJsonCount(10, 'data');
+    }
+
+    public function testItCanFilterProducts()
+    {
+        Product::factory()->create([
+            'name' => 'Producto 1',
+            'price' => 100_000,
+            'description' => 'Descripción del producto 1',
+            'category_id' => 1,
+            'image' => 'http://example.com/image.jpg'
+        ]);
+
+        $response = $this->getJson('/api/products?name=Producto&category_id=1&price[min]=1000&price[max]=200000');
+
+        $response->assertStatus(Response::HTTP_OK)
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => [
+                        'id',
+                        'type',
+                        'attributes' => [
+                            'name',
+                            'price',
+                            'description',
+                            'category_id',
+                            'image',
+                        ],
+                        'links'
+                    ]
+                ],
+                'meta',
+                'links'
+            ])
+            ->assertJsonCount(1, 'data');
     }
 
     public function testItCanShowAProduct()
@@ -112,6 +148,82 @@ class ProductApiTest extends TestCase
         ]);
     }
 
+    public function testItCanCreateAProductWithPlaceholderImage()
+    {
+        Storage::fake('products');
+
+        $data = [
+            'name' => $this->faker->word,
+            'price' => $this->faker->randomFloat(2, 10, 1000),
+            'description' => $this->faker->paragraph,
+            'category_id' => '1'
+        ];
+
+        $response = $this->postJson('/api/products', $data);
+
+        $response->assertStatus(Response::HTTP_CREATED)
+            ->assertJsonStructure([
+                'data' => [
+                    'id',
+                    'type',
+                    'attributes' => [
+                        'name',
+                        'price',
+                        'description',
+                        'category_id',
+                        'image',
+                    ],
+                    'links'
+                ]
+            ]);
+
+        $this->assertDatabaseHas('products', [
+            'name' => $data['name'],
+            'price' => $data['price'],
+            'description' => $data['description'],
+            'category_id' => $data['category_id']
+        ]);
+    }
+
+    public function testItCanCreateAProductExceptionImageService()
+    {
+        Storage::fake('products');
+
+        Storage::shouldReceive('disk')->andThrow(new Exception('Image service error'));
+
+        $data = [
+            'name' => $this->faker->word,
+            'price' => $this->faker->randomFloat(2, 10, 1000),
+            'description' => $this->faker->paragraph,
+            'category_id' => '1'
+        ];
+
+        $response = $this->postJson('/api/products', $data);
+
+        $response->assertStatus(Response::HTTP_CREATED)
+            ->assertJsonStructure([
+                'data' => [
+                    'id',
+                    'type',
+                    'attributes' => [
+                        'name',
+                        'price',
+                        'description',
+                        'category_id',
+                        'image',
+                    ],
+                    'links'
+                ]
+            ]);
+
+        $this->assertDatabaseHas('products', [
+            'name' => $data['name'],
+            'price' => $data['price'],
+            'description' => $data['description'],
+            'category_id' => $data['category_id']
+        ]);
+    }
+
     public function testItValidatesRequiredFieldsWhenCreatingAProduct()
     {
         $response = $this->postJson('/api/products', []);
@@ -122,10 +234,13 @@ class ProductApiTest extends TestCase
 
     public function testItCanUpdateAProduct()
     {
+        Storage::fake('products');
+
         $product = Product::factory()->create();
 
         $data = [
             'name' => 'Producto actualizado',
+            'image' => UploadedFile::fake()->image('avatar.jpg'),
             'price' => 150.00,
         ];
 
