@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use Tests\TestCase;
+use App\Models\Order;
 use App\Models\Product;
 use Illuminate\Http\Response;
 use Illuminate\Http\UploadedFile;
@@ -275,10 +276,41 @@ class ProductApiTest extends TestCase
 
     public function testItShowsProductsStats()
     {
-        $product = Product::factory()->create();
+        $product = Product::factory()->create(['name' => 'Producto #1', 'price' => 100.00]);
+        for ($i = 0; $i < 51; $i++) {
+            Order::factory()->create([
+                'product_id' => $product->id,
+                'quantity' => 2
+            ]);
+        }
 
         $response = $this->getJson('/api/orders/stats');
 
-        $response->assertStatus(Response::HTTP_OK);
+        $response->assertStatus(Response::HTTP_OK)
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => [
+                        'id',
+                        'type',
+                        'attributes' => [
+                            'name',
+                            'total_orders',
+                            'average_price',
+                            'total_revenue'
+                        ]
+                    ]
+                ]
+            ])->assertJson([
+                'data' => [
+                    [
+                        'attributes' => [
+                            'name' => 'Producto #1',
+                            'total_orders' => 51,
+                            'average_price' => '100.00',
+                            'total_revenue' => '10200.00'
+                        ]
+                    ]
+                ]
+            ]);
     }
 }

@@ -121,6 +121,11 @@ The following indexes have been created:
 - **Table `categories`**
   - Primary key on `id`
 
+- **Additional Index to Consider:**
+  - A compound index on `orders.product_id` and `orders.order_date` to optimize queries that retrieve a product and group results by date.
+
+- Additionally, for complex queries, the results can be stored in a separate table and updated periodically.
+
 - Based on the assessment, the query constructed using the `orders` and `products` tables is:
 
 ```SQL
@@ -136,12 +141,12 @@ HAVING COUNT(orders.id) > 50
 ORDER BY `total_revenue` DESC
 ```
 
-- To optimize the query, instead of performing a join to retrieve the price, this value should be stored directly in the `orders` table.
-  Additionally, a separate query is needed to fetch `products.name`. This can be achieved by creating a query that selects only the `products.id` from the previous result.
+- To optimize the query, instead of performing a join to retrieve the price and name from the `products` table, this values should be stored directly in the `orders` table.
 
 ```SQL
 SELECT
     `orders`.`product_id`,
+    `orders`.`product_name`,
     COUNT(orders.id) AS total_orders,
     ROUND(AVG(orders.price), 2) AS average_price,
     SUM(products.price * orders.quantity) AS total_revenue
@@ -149,14 +154,6 @@ FROM `orders`
 GROUP BY `orders`.`product_id`
 HAVING COUNT(orders.id) > 50
 ORDER BY `total_revenue` DESC
-```
-
-Second query to retrieve Product's names
-
-```SQL
-SELECT `products.id`, `products.name`
-FROM `products`
-WHERE `products.id` IN ({product_ids})
 ```
 
 - Finally, caching the queries can further improve performance.

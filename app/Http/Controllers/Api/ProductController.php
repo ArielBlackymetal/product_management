@@ -7,6 +7,7 @@ use App\Services\ImageService;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ProductResource;
 use App\Http\Resources\ProductCollection;
+use App\Http\Resources\StatsCollection;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Interfaces\ProductRepositoryInterface;
@@ -93,6 +94,6 @@ class ProductController extends Controller
      */
     public function stats()
     {
-        return response()->json($this->productRepo->stats());
+        return new StatsCollection($this->productRepo->stats());
     }
 }
