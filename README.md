@@ -103,5 +103,60 @@ php artisan db:seed --database=test
 
 php artisan storage:link
 ```
+### SQL optimization
 
-- Execute seeder for
+The following indexes have been created:
+
+- **Table `products`**
+  - Primary key on `id`
+  - Index on `name` for search optimization
+  - Index on `price` for price range queries
+  - Index on `category_id` for category-based searches
+
+- **Table `orders`**
+  - Index on `product_id` to link orders to their respective products
+  - Index on `order_date` for date-based searches
+  - Index on `user_id` for user-specific searches
+
+- **Table `categories`**
+  - Primary key on `id`
+
+- Based on the assessment, the query constructed using the `orders` and `products` tables is:
+
+```SQL
+SELECT
+    `products`.`id`,
+    `products`.`name`,
+    COUNT(orders.id) AS total_orders,
+    ROUND(AVG(products.price), 2) AS average_price,
+    SUM(products.price * orders.quantity) AS total_revenue
+FROM `orders` INNER JOIN `products` ON `orders`.`product_id` = `products`.`id`
+GROUP BY `products`.`id`, `products`.`name`
+HAVING COUNT(orders.id) > 50
+ORDER BY `total_revenue` DESC
+```
+
+- To optimize the query, instead of performing a join to retrieve the price, this value should be stored directly in the `orders` table.
+  Additionally, a separate query is needed to fetch `products.name`. This can be achieved by creating a query that selects only the `products.id` from the previous result.
+
+```SQL
+SELECT
+    `orders`.`product_id`,
+    COUNT(orders.id) AS total_orders,
+    ROUND(AVG(orders.price), 2) AS average_price,
+    SUM(products.price * orders.quantity) AS total_revenue
+FROM `orders`
+GROUP BY `orders`.`product_id`
+HAVING COUNT(orders.id) > 50
+ORDER BY `total_revenue` DESC
+```
+
+Second query to retrieve Product's names
+
+```SQL
+SELECT `products.id`, `products.name`
+FROM `products`
+WHERE `products.id` IN ({product_ids})
+```
+
+- Finally, caching the queries can further improve performance.

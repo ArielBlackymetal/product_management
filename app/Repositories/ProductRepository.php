@@ -6,14 +6,17 @@ use App\Models\Product;
 use App\Interfaces\ProductStoreInterface;
 use App\Interfaces\ProductUpdateInterface;
 use App\Interfaces\ProductDeleteInterface;
+use App\Interfaces\ProductsStatsInterface;
 use App\Interfaces\ProductRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 
 class ProductRepository implements
     ProductRepositoryInterface,
     ProductStoreInterface,
     ProductUpdateInterface,
-    ProductDeleteInterface
+    ProductDeleteInterface,
+    ProductsStatsInterface
 {
     /**
      * {@inheritdoc}
@@ -56,5 +59,26 @@ class ProductRepository implements
     public function delete(Product $product): void
     {
         $product->delete();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function stats(): array
+    {
+        $productsWithStats = DB::table('orders')
+            ->select(
+                'products.id',
+                'products.name',
+                DB::raw('COUNT(orders.id) as total_orders'),
+                DB::raw('ROUND(AVG(products.price), 2) as average_price'),
+                DB::raw('SUM(products.price * orders.quantity) as total_revenue')
+            )
+            ->join('products', 'orders.product_id', '=', 'products.id')
+            ->groupBy('products.id', 'products.name')
+            ->havingRaw('COUNT(orders.id) > 50')
+            ->orderByDesc('total_revenue')
+            ->get();
+        return $productsWithStats->toArray();
     }
 }

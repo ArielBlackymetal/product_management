@@ -272,4 +272,13 @@ class ProductApiTest extends TestCase
         $response->assertStatus(Response::HTTP_NO_CONTENT);
         $this->assertDatabaseMissing('products', ['id' => $product->id]);
     }
+
+    public function testItShowsProductsStats()
+    {
+        $product = Product::factory()->create();
+
+        $response = $this->getJson('/api/orders/stats');
+
+        $response->assertStatus(Response::HTTP_OK);
+    }
 }

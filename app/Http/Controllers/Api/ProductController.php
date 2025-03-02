@@ -85,6 +85,14 @@ class ProductController extends Controller
     public function destroy(Product $product)
     {
         $this->productRepo->delete($product);
-        return response()->json(null, 204);
+        return response()->json(null, Response::HTTP_NO_CONTENT);
+    }
+
+    /**
+     * Get products stats
+     */
+    public function stats()
+    {
+        return response()->json($this->productRepo->stats());
     }
 }
